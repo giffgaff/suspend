@@ -10,10 +10,19 @@
 namespace Flarum\Suspend;
 
 use Flarum\Api\Serializer\UserSerializer;
+use Flarum\Formatter\Formatter;
+use Flarum\Post\Post;
 use Flarum\User\User;
 
 class AddUserSuspendAttributes
 {
+    public $formatter;
+    
+    public function __construct(Formatter $formatter)
+    {
+        $this->formatter = $formatter;
+    }
+    
     public function __invoke(UserSerializer $serializer, User $user)
     {
         $attributes = [];
@@ -22,13 +31,13 @@ class AddUserSuspendAttributes
 
         if ($canSuspend) {
             $attributes['suspendedUntil'] = $serializer->formatDate($user->suspended_until);
-            $attributes['suspendMessage'] = $user->suspend_message;
-            $attributes['suspendReason'] = $user->suspend_reason;
+            $attributes['suspendMessage'] = empty($user->suspend_message) ? $user->suspend_message : $this->formatter->render($user->suspend_message, new Post());
+            $attributes['suspendReason'] = empty($user->suspend_reason) ? $user->suspend_reason : $this->formatter->render($user->suspend_reason, new Post());
         }
 
-        if ($isCurrentUser || $canSuspend) {
+        elseif ($isCurrentUser || $canSuspend) {
             if (! empty($user->suspend_message)) {
-                $attributes['suspendMessage'] = $user->suspend_message;
+                $attributes['suspendMessage'] = empty($user->suspend_message) ? $user->suspend_message : $this->formatter->render($user->suspend_message, new Post());
             }
             $attributes['suspendedUntil'] = $serializer->formatDate($user->suspended_until);
         }

@@ -24,7 +24,7 @@ export default class ResultsModal extends Modal {
         return (
             <div className="Modal-body">
                 <div className="Form Form--centered">
-                    <p className="helpText">{this.message}</p>
+                    <p className="helpText">{m.trust(this.message)}</p>
                     <p className="helpText">{timespan}</p>
                     <div className="Form-group">
                         <Button className="Button Button--primary Button--block" onclick={this.hide.bind(this)}>
