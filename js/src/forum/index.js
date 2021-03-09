@@ -18,7 +18,9 @@ app.initializers.add('flarum-suspend', () => {
   User.prototype.canSuspend = Model.attribute('canSuspend');
   User.prototype.suspendedUntil = Model.attribute('suspendedUntil', Model.transformDate);
   User.prototype.suspendReason = Model.attribute('suspendReason');
+  User.prototype.suspendReasonRaw = Model.attribute('suspendReasonRaw');
   User.prototype.suspendMessage = Model.attribute('suspendMessage');
+  User.prototype.suspendMessageRaw = Model.attribute('suspendMessageRaw');
 
   extend(UserControls, 'moderationControls', (items, user) => {
     if (user.canSuspend()) {

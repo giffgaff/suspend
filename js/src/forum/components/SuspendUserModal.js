@@ -11,7 +11,9 @@ export default class SuspendUserModal extends Modal {
 
     let until = this.attrs.user.suspendedUntil();
     let reason = this.attrs.user.suspendReason();
+    let reasonRaw = this.attrs.user.suspendReasonRaw();
     let message = this.attrs.user.suspendMessage();
+    let messageRaw = this.attrs.user.suspendMessageRaw();
     let status = null;
 
     if (new Date() > until) until = null;
@@ -23,7 +25,9 @@ export default class SuspendUserModal extends Modal {
 
     this.status = Stream(status);
     this.reason = Stream(reason);
+    this.reasonRaw = Stream(reasonRaw);
     this.message = Stream(message);
+    this.messageRaw = Stream(messageRaw);
     this.daysRemaining = Stream(status === 'limited' && -dayjs().diff(until, 'days') + 1);
   }
 
@@ -104,7 +108,7 @@ export default class SuspendUserModal extends Modal {
       'reason',
       <label>
         {app.translator.trans('flarum-suspend.forum.suspend_user.reason')}
-        <textarea className="FormControl" bidi={this.reason} placeholder="optional" rows="2" />
+        <textarea className="FormControl" bidi={this.reasonRaw} placeholder="optional" rows="2" />
       </label>,
       70
     );
@@ -113,7 +117,7 @@ export default class SuspendUserModal extends Modal {
       'message',
       <label>
         {app.translator.trans('flarum-suspend.forum.suspend_user.display_message')}
-        <textarea className="FormControl" bidi={this.message} placeholder="optional" rows="2" />
+        <textarea className="FormControl" bidi={this.messageRaw} placeholder="optional" rows="2" />
       </label>,
       60
     );
@@ -141,7 +145,7 @@ export default class SuspendUserModal extends Modal {
       // no default
     }
 
-    this.attrs.user.save({ suspendedUntil: suspendedUntil, suspendReason: this.reason(), suspendMessage: this.message() }).then(
+    this.attrs.user.save({ suspendedUntil: suspendedUntil, suspendReason: this.reasonRaw(), suspendMessage: this.messageRaw() }).then(
       () => this.hide(),
       this.loaded.bind(this)
     );
