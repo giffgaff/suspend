@@ -8,10 +8,12 @@
  */
 
 use Flarum\Api\Serializer\BasicUserSerializer;
+use Flarum\Api\Serializer\CurrentUserSerializer;
 use Flarum\Api\Serializer\UserSerializer;
 use Flarum\Event\ConfigureUserGambits;
 use Flarum\Extend;
 use Flarum\Suspend\Access\UserPolicy;
+use Flarum\Suspend\AddCurrentUserSuspendAttributes;
 use Flarum\Suspend\AddUserSuspendAttributes;
 use Flarum\Suspend\Event\Suspended;
 use Flarum\Suspend\Event\Unsuspended;
@@ -38,6 +40,9 @@ return [
 
     (new Extend\ApiSerializer(UserSerializer::class))
         ->mutate(AddUserSuspendAttributes::class),
+
+    (new Extend\ApiSerializer(CurrentUserSerializer::class))
+        ->mutate(AddCurrentUserSuspendAttributes::class),
 
     new Extend\Locales(__DIR__.'/locale'),
 

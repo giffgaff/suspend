@@ -26,20 +26,13 @@ class AddUserSuspendAttributes
     public function __invoke(UserSerializer $serializer, User $user)
     {
         $attributes = [];
-        $canSuspend = $serializer->getActor()->can('suspend', $user);
-        $isCurrentUser = $serializer->getActor()->id === $user->id;
+        $canSuspend = $serializer->getActor()->hasPermission('user.suspend');
 
+        // If the user has `user.suspend` permission, then they may access the suspension properties
         if ($canSuspend) {
             $attributes['suspendedUntil'] = $serializer->formatDate($user->suspended_until);
-            $attributes['suspendMessage'] = empty($user->suspend_message) ? $user->suspend_message : $this->formatter->render($user->suspend_message, new Post());
-            $attributes['suspendReason'] = empty($user->suspend_reason) ? $user->suspend_reason : $this->formatter->render($user->suspend_reason, new Post());
-        }
-
-        elseif ($isCurrentUser || $canSuspend) {
-            if (! empty($user->suspend_message)) {
-                $attributes['suspendMessage'] = empty($user->suspend_message) ? $user->suspend_message : $this->formatter->render($user->suspend_message, new Post());
-            }
-            $attributes['suspendedUntil'] = $serializer->formatDate($user->suspended_until);
+            $attributes['suspendMessage'] = empty($user->suspend_message) ? $user->suspend_message : $this->formatter->unparse($user->suspend_message, new Post());
+            $attributes['suspendReason'] = empty($user->suspend_reason) ? $user->suspend_reason : $this->formatter->unparse($user->suspend_reason, new Post());
         }
 
         $attributes['canSuspend'] = $canSuspend;
