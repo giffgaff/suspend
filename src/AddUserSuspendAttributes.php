@@ -28,7 +28,7 @@ class AddUserSuspendAttributes
         $attributes = [];
         $canSuspend = $serializer->getActor()->hasPermission('user.suspend');
 
-        // If the user has `user.suspend` permission, then they may access the suspension properties
+        // If the user has `user.suspend` permission, then they may access the suspension properties. Added as HTML fragment for preview purposes, and as raw for editing.
         if ($canSuspend) {
             $attributes['suspendedUntil'] = $serializer->formatDate($user->suspended_until);
             $attributes['suspendMessageRaw'] = empty($user->suspend_message) ? $user->suspend_message : $this->formatter->unparse($user->suspend_message, new Post());

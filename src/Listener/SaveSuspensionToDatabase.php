@@ -65,8 +65,9 @@ class SaveSuspensionToDatabase
 
             if ($attributes['suspendedUntil']) {
                 $user->suspended_until = new DateTime($attributes['suspendedUntil']);
-                $user->suspend_reason = empty($attributes['suspendReason']) ? null : $this->formatter->parse($attributes['suspendReason'], new Post());
-                $user->suspend_message = empty($attributes['suspendMessage']) ? null : $this->formatter->parse($attributes['suspendMessage'], new Post());
+                // Parse the `raw` (markdown) version of the message/reason, and store it as XML in the DB
+                $user->suspend_reason = empty($attributes['suspendReasonRaw']) ? null : $this->formatter->parse($attributes['suspendReasonRaw'], new Post());
+                $user->suspend_message = empty($attributes['suspendMessageRaw']) ? null : $this->formatter->parse($attributes['suspendMessageRaw'], new Post());
             } else {
                 $user->suspend_reason = null;
                 $user->suspend_message = null;

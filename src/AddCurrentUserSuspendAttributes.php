@@ -30,7 +30,7 @@ class AddCurrentUserSuspendAttributes
         // Double check the actor is the user being serialized
         $isCurrentUser = $serializer->getActor()->id === $user->id;
 
-        // If the current user is suspended, add the suspension message and until date
+        // If the current user is suspended, add the suspension message and until date as an HTML fragment
         if ($isCurrentUser && !empty($user->suspended_until)) {
             if (! empty($user->suspend_message)) {
                 $attributes['suspendMessage'] = empty($user->suspend_message) ? $user->suspend_message : $this->formatter->render($user->suspend_message, new Post());
