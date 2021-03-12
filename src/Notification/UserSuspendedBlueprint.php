@@ -9,8 +9,11 @@
 
 namespace Flarum\Suspend\Notification;
 
+use Carbon\Carbon;
+use Flarum\Formatter\Formatter;
 use Flarum\Notification\Blueprint\BlueprintInterface;
 use Flarum\Notification\MailableInterface;
+use Flarum\Post\Post;
 use Flarum\User\User;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -27,6 +30,13 @@ class UserSuspendedBlueprint implements BlueprintInterface, MailableInterface
     public $actor;
 
     /**
+     * suspend_message, formatted as HTML
+     *
+     * @var string
+     */
+    public $formattedContent;
+
+    /**
      * @param User $user
      * @param User $actor
      */
@@ -34,6 +44,10 @@ class UserSuspendedBlueprint implements BlueprintInterface, MailableInterface
     {
         $this->user = $user;
         $this->actor = $actor;
+
+        /** @var Formatter */
+        $formatter = app()->make(Formatter::class);
+        $this->formattedContent = $this->user->suspend_message ? $formatter->render($this->user->suspend_message, new Post()) : $this->user->suspend_message;
     }
 
     /**
@@ -57,7 +71,7 @@ class UserSuspendedBlueprint implements BlueprintInterface, MailableInterface
      */
     public function getData()
     {
-        return $this->user->suspended_until;
+        return $this->user->suspended_until.Carbon::now();
     }
 
     /**
