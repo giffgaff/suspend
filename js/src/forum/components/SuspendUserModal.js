@@ -1,9 +1,9 @@
-import Modal from 'flarum/components/Modal';
-import Button from 'flarum/components/Button';
+import Modal from "flarum/components/Modal";
+import Button from "flarum/components/Button";
 
-import Stream from 'flarum/utils/Stream';
-import withAttr from 'flarum/utils/withAttr';
-import ItemList from 'flarum/utils/ItemList';
+import Stream from "flarum/utils/Stream";
+import withAttr from "flarum/utils/withAttr";
+import ItemList from "flarum/utils/ItemList";
 
 export default class SuspendUserModal extends Modal {
   oninit(vnode) {
@@ -19,8 +19,8 @@ export default class SuspendUserModal extends Modal {
     if (new Date() > until) until = null;
 
     if (until) {
-      if (until.getFullYear() === 9999) status = 'indefinitely';
-      else status = 'limited';
+      if (until.getFullYear() === 9999) status = "indefinitely";
+      else status = "limited";
     }
 
     this.status = Stream(status);
@@ -28,15 +28,22 @@ export default class SuspendUserModal extends Modal {
     this.reasonRaw = Stream(reasonRaw);
     this.message = Stream(message);
     this.messageRaw = Stream(messageRaw);
-    this.daysRemaining = Stream(status === 'limited' && -dayjs().diff(until, 'days') + 1);
+    this.daysRemaining = Stream(
+      status === "limited" && -dayjs().diff(until, "days") + 1
+    );
+
+    this.editingReason = reason ? false : true;
+    this.editingMessage = false;
   }
 
   className() {
-    return 'SuspendUserModal Modal--medium';
+    return "SuspendUserModal Modal--medium";
   }
 
   title() {
-    return app.translator.trans('flarum-suspend.forum.suspend_user.title', { user: this.attrs.user });
+    return app.translator.trans("flarum-suspend.forum.suspend_user.title", {
+      user: this.attrs.user,
+    });
   }
 
   content() {
@@ -44,14 +51,22 @@ export default class SuspendUserModal extends Modal {
       <div className="Modal-body">
         <div className="Form">
           <div className="Form-group">
-            <label>{app.translator.trans('flarum-suspend.forum.suspend_user.status_heading')}</label>
-            <div>
-              {this.formItems().toArray()}
-            </div>
+            <label>
+              {app.translator.trans(
+                "flarum-suspend.forum.suspend_user.status_heading"
+              )}
+            </label>
+            <div>{this.formItems().toArray()}</div>
           </div>
           <div className="Form-group">
-            <Button className="Button Button--primary" loading={this.loading} type="submit">
-              {app.translator.trans('flarum-suspend.forum.suspend_user.submit_button')}
+            <Button
+              className="Button Button--primary"
+              loading={this.loading}
+              type="submit"
+            >
+              {app.translator.trans(
+                "flarum-suspend.forum.suspend_user.submit_button"
+              )}
             </Button>
           </div>
         </div>
@@ -63,61 +78,125 @@ export default class SuspendUserModal extends Modal {
     const items = new ItemList();
 
     items.add(
-      'not-suspended',
+      "not-suspended",
       <label className="checkbox">
-        <input type="radio" name="status" checked={!this.status()} value="" onclick={withAttr('value', this.status)} />
-        {app.translator.trans('flarum-suspend.forum.suspend_user.not_suspended_label')}
+        <input
+          type="radio"
+          name="status"
+          checked={!this.status()}
+          value=""
+          onclick={withAttr("value", this.status)}
+        />
+        {app.translator.trans(
+          "flarum-suspend.forum.suspend_user.not_suspended_label"
+        )}
       </label>,
       100
     );
 
     items.add(
-      'indefinitely',
+      "indefinitely",
       <label className="checkbox">
-        <input type="radio" name="status" checked={this.status() === 'indefinitely'} value='indefinitely' onclick={withAttr('value', this.status)} />
-        {app.translator.trans('flarum-suspend.forum.suspend_user.indefinitely_label')}
+        <input
+          type="radio"
+          name="status"
+          checked={this.status() === "indefinitely"}
+          value="indefinitely"
+          onclick={withAttr("value", this.status)}
+        />
+        {app.translator.trans(
+          "flarum-suspend.forum.suspend_user.indefinitely_label"
+        )}
       </label>,
       90
     );
 
     items.add(
-      'time-suspension',
+      "time-suspension",
       <label className="checkbox SuspendUserModal-days">
-        <input type="radio" name="status" checked={this.status() === 'limited'} value='limited' onclick={e => {
-          this.status(e.target.value);
-          m.redraw.sync();
-          this.$('.SuspendUserModal-days-input input').select();
-          e.redraw = false;
-        }} />
-        {app.translator.trans('flarum-suspend.forum.suspend_user.limited_time_label')}
-        {this.status() === 'limited' ? (
+        <input
+          type="radio"
+          name="status"
+          checked={this.status() === "limited"}
+          value="limited"
+          onclick={(e) => {
+            this.status(e.target.value);
+            m.redraw.sync();
+            this.$(".SuspendUserModal-days-input input").select();
+            e.redraw = false;
+          }}
+        />
+        {app.translator.trans(
+          "flarum-suspend.forum.suspend_user.limited_time_label"
+        )}
+        {this.status() === "limited" ? (
           <div className="SuspendUserModal-days-input">
-            <input type="number"
+            <input
+              type="number"
               min="0"
               value={this.daysRemaining()}
-              oninput={withAttr('value', this.daysRemaining)}
-              className="FormControl" />
-            {app.translator.trans('flarum-suspend.forum.suspend_user.limited_time_days_text')}
+              oninput={withAttr("value", this.daysRemaining)}
+              className="FormControl"
+            />
+            {app.translator.trans(
+              "flarum-suspend.forum.suspend_user.limited_time_days_text"
+            )}
           </div>
-        ) : ''}
+        ) : (
+          ""
+        )}
       </label>,
       80
     );
 
+    const reasonContent = this.editingReason ? (
+      <textarea
+        className="FormControl"
+        bidi={this.reasonRaw}
+        placeholder="optional"
+        rows="2"
+      />
+    ) : (
+      <div
+        className="Suspend-content"
+        onclick={this.editReason.bind(this)}
+      >
+        {m.trust(this.reason())}
+      </div>
+    );
+
     items.add(
-      'reason',
+      "reason",
       <label>
-        {app.translator.trans('flarum-suspend.forum.suspend_user.reason')}
-        <textarea className="FormControl" bidi={this.reasonRaw} placeholder="optional" rows="2" />
+        {app.translator.trans("flarum-suspend.forum.suspend_user.reason")}
+        {reasonContent}
       </label>,
       70
     );
 
+    const messageContent = this.editingMessage ? (
+      <textarea
+        className="FormControl"
+        bidi={this.messageRaw}
+        placeholder="optional"
+        rows="2"
+      />
+    ) : (
+      <div
+        className="Suspend-content"
+        onclick={this.editMessage.bind(this)}
+      >
+        {m.trust(this.message())}
+      </div>
+    );
+
     items.add(
-      'message',
+      "message",
       <label>
-        {app.translator.trans('flarum-suspend.forum.suspend_user.display_message')}
-        <textarea className="FormControl" bidi={this.messageRaw} placeholder="optional" rows="2" />
+        {app.translator.trans(
+          "flarum-suspend.forum.suspend_user.display_message"
+        )}
+        {messageContent}
       </label>,
       60
     );
@@ -133,21 +212,40 @@ export default class SuspendUserModal extends Modal {
     let suspendedUntil = null;
 
     switch (this.status()) {
-      case 'indefinitely':
-        suspendedUntil = new Date('2038-01-01');
+      case "indefinitely":
+        suspendedUntil = new Date("2038-01-01");
         break;
 
-      case 'limited':
-        suspendedUntil = dayjs().add(this.daysRemaining(), 'days').toDate();
+      case "limited":
+        suspendedUntil = dayjs().add(this.daysRemaining(), "days").toDate();
         break;
 
       default:
       // no default
     }
 
-    this.attrs.user.save({ suspendedUntil: suspendedUntil, suspendReason: this.reasonRaw(), suspendMessage: this.messageRaw() }).then(
-      () => this.hide(),
-      this.loaded.bind(this)
-    );
+    this.attrs.user
+      .save({
+        suspendedUntil: suspendedUntil,
+        suspendReasonRaw: this.reasonRaw(),
+        suspendMessageRaw: this.messageRaw(),
+      })
+      .then(() => this.hide(), this.loaded.bind(this));
+  }
+
+  /**
+   * Edit the reason.
+   */
+  editReason() {
+    this.editingReason = true;
+    m.redraw();
+  }
+
+  /**
+   * Edit the display message.
+   */
+  editMessage() {
+    this.editingMessage = true;
+    m.redraw();
   }
 }
