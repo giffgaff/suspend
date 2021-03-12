@@ -33,7 +33,7 @@ export default class SuspendUserModal extends Modal {
     );
 
     this.editingReason = reason ? false : true;
-    this.editingMessage = false;
+    this.editingMessage = message ? false : true;
   }
 
   className() {
